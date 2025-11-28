@@ -1,4 +1,4 @@
-#STREME Integration (Important Notice)
+STREME Integration (Important Notice)
 
 STREME is part of the MEME Suite, which currently has severe dependency issues on macOS (especially Apple Silicon, ARM64). As a result, the local installation of STREME may fail due to missing Perl, ICU, or OpenMPI builds in the conda ecosystem.
 
