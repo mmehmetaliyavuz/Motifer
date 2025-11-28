@@ -19,5 +19,5 @@ enriched motif reports
 This approach guarantees that STREME works identically on all systems (macOS, Windows, Linux) without local installation.
 
 Colab notebook:
-streme_motifer_colab.ipynb
+[streme_motifer_colab.ipynb](https://colab.research.google.com/drive/1lZ0Tragc-1aJ5BI_lF-Pt5eatKlNA4ol?usp=sharing)
 
