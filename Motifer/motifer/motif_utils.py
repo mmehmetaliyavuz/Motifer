@@ -3,7 +3,7 @@ import pandas as pd
 
 
 def consensus_from_seqs(seqs, ignore_chars=set("-."), tie_char="X"):
-    """Hizalanmış sekanslardan konsensüs dizi çıkarır."""
+    """It extracts a consensus sequence from aligned sequences."""
     if not seqs:
         return ""
     L = max(len(s) for s in seqs)
@@ -33,8 +33,7 @@ def column_frequency_matrix(
     ignore_chars="-.",
 ):
     """
-    MSA'dan pozisyon bazlı aa frekans matrisi (pandas DataFrame) üretir.
-    Sütunlar: pos, total, A, C, D, ...
+   Generates a position-based frequency matrix (pandas DataFrame) from MSA. Columns: pos, total, A, C, D, ...
     """
     if not seqs:
         return pd.DataFrame()
@@ -60,12 +59,12 @@ def column_frequency_matrix(
 
 def extract_motif_core(consensus, freq_df, threshold=0.50):
     """
-    Belirli eşiğin (threshold) üstünde frekansa sahip pozisyonlardan core motif çıkarır.
+It extracts core motifs from positions with frequencies above a certain threshold.
     """
     if freq_df.empty:
         return [], ""
     freq_df = freq_df.copy()
-    # pos ve total'den sonra aa kolonları var varsayımı
+    # Assumption that there are columns aa after pos and total
     freq_df["max_freq"] = freq_df.iloc[:, 2:].max(axis=1)
     core_positions = freq_df[freq_df["max_freq"] >= threshold]["pos"].tolist()
     core_seq = "".join(consensus[p - 1] for p in core_positions)

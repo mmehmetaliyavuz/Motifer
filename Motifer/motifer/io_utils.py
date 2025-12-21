@@ -1,14 +1,14 @@
 from collections import Counter
 
 def normalize_seq(seq: str) -> str:
-    """Basit amino asit normalize; U->C, O->K gibi."""
+    """Normalizing simple amino acids; U->C, O->K, etc."""
     seq = str(seq).upper().replace(" ", "")
     seq = seq.replace("U", "C").replace("O", "K")
     return seq
 
 
 def read_fasta_alignment(path):
-    """FASTA hizalama dosyasından sekans listesi döner."""
+    """The sequence list is returned from the FASTA alignment file."""
     seqs = []
     current = []
     with open(path, "r", encoding="utf-8", errors="ignore") as f:

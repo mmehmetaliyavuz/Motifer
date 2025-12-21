@@ -17,44 +17,44 @@ class AMPAnalysisPipeline:
         self.length_bins = length_bins or LENGTH_BINS
         self.df: pd.DataFrame | None = None
 
-    # ---------- 1. Veri indirme & yükleme ----------
+    # ---------- 1. Data ----------
 
     def download_excel(self):
         path = os.path.join(self.base_dir, DRAMP_EXCEL_FILENAME)
         if os.path.exists(path):
-            print(f"[INFO] Excel zaten var: {path}")
+            print(f"[INFO] Excel is already exist: {path}")
             return path
 
-        print(f"[INFO] DRAMP Excel indiriliyor: {DRAMP_EXCEL_URL}")
+        print(f"[INFO] DRAMP Excel is downloading: {DRAMP_EXCEL_URL}")
         resp = requests.get(DRAMP_EXCEL_URL)
         if resp.status_code == 200:
             with open(path, "wb") as f:
                 f.write(resp.content)
-            print(f"[OK] Kaydedildi: {path}")
+            print(f"[OK] Recorded: {path}")
         else:
-            raise RuntimeError(f"Excel indirilemedi (status={resp.status_code})")
+            raise RuntimeError(f"Excel could not dowloaded (status={resp.status_code})")
         return path
 
     def load_dataframe(self):
         excel_path = os.path.join(self.base_dir, DRAMP_EXCEL_FILENAME)
-        print(f"[INFO] Excel okunuyor: {excel_path}")
+        print(f"[INFO] Excel is reading: {excel_path}")
         df = pd.read_excel(excel_path)
 
         if "Sequence" not in df.columns:
-            raise KeyError("DataFrame'de 'Sequence' sütunu yok.")
+            raise KeyError("The DataFrame does not have a 'Sequence' column.")
 
         df = df.dropna(subset=["Sequence"]).copy()
         df["Sequence"] = df["Sequence"].astype(str)
         df["length"] = df["Sequence"].str.len()
         self.df = df
-        print(f"[OK] Toplam peptide: {len(df)}")
+        print(f"[OK] Total peptide: {len(df)}")
         return df
 
-    # ---------- 2. Uzunluk dağılımı ----------
+    # ---------- 2. Lenght Range  ----------
 
     def plot_length_distribution(self, bin_size=3, show=True, save_path=None):
         if self.df is None:
-            raise ValueError("DataFrame yok. Önce load_dataframe() çağır.")
+            raise ValueError("There is no data frame. Call load_dataframe() first..")
 
         max_len = self.df["length"].max()
         max_bin = int(math.ceil(max_len / bin_size) * bin_size)
@@ -72,15 +72,15 @@ class AMPAnalysisPipeline:
 
         plt.figure(figsize=(10, 5))
         plt.bar(counts.index.astype(str), counts.values)
-        plt.xlabel("Uzunluk Aralığı (aa)")
-        plt.ylabel("AMP Sayısı")
-        plt.title("AMP Uzunluk Dağılımı")
+        plt.xlabel("Lenght Range (aa)")
+        plt.ylabel("AMP Number")
+        plt.title("AMP Length Distribution")
         plt.xticks(rotation=45)
         plt.tight_layout()
 
         if save_path:
             plt.savefig(save_path, dpi=300)
-            print(f"[OK] Histogram kaydedildi: {save_path}")
+            print(f"[OK] Histogram recorded: {save_path}")
         if show:
             plt.show()
 
@@ -88,7 +88,7 @@ class AMPAnalysisPipeline:
 
     def export_bins_to_csv(self):
         if self.df is None:
-            raise ValueError("DataFrame yok. Önce load_dataframe() çağır.")
+            raise ValueError("There is no data frame. Call load_dataframe() first..")
 
         for low, high in self.length_bins:
             subset = self.df[
@@ -96,7 +96,7 @@ class AMPAnalysisPipeline:
             ].copy()
             fname = os.path.join(self.base_dir, f"{low}_{high}aa_peptides.csv")
             subset.to_csv(fname, index=False)
-            print(f"[OK] {fname} oluşturuldu → {len(subset)} peptide")
+            print(f"[OK] {fname} are created → {len(subset)} peptide")
 
     # ---------- 4. CSV -> FASTA ----------
 
@@ -148,7 +148,7 @@ class AMPAnalysisPipeline:
             print(f"[INFO] MAFFT: {in_fa} → {out_fa}")
             self.run_mafft(in_fa, out_fa, anysymbol=False)
 
-    # ---------- 6. Konsensüs & core motif ----------
+    # ---------- 6. Consensüs & core motif ----------
 
     def compute_consensus_for_bins(self, threshold=0.5):
         results = {}
@@ -164,8 +164,8 @@ class AMPAnalysisPipeline:
             freq_df = column_frequency_matrix(seqs)
             core_pos, core_seq = extract_motif_core(consensus, freq_df, threshold)
 
-            print("  Core pozisyonları (ilk 20):", core_pos[:20])
-            print("  Core motif (ilk 50 aa):", core_seq[:50])
+            print("  Core position (fisrt 20):", core_pos[:20])
+            print("  Core motif (fisrt 50 aa):", core_seq[:50])
 
             results[(low, high)] = {
                 "consensus": consensus,
@@ -175,7 +175,13 @@ class AMPAnalysisPipeline:
             }
         return results
 
-    # ---------- 7. STREME (opsiyonel) ----------
+    def export_consensus(self, results, out_fasta):
+        with open(out_fasta, "w") as f:
+            for (low, high), d in results.items():
+                f.write(f">consensus_{low}_{high}\n{d['consensus']}\n")
+                f.write(f">core_{low}_{high}\n{d['core_sequence']}\n")
+
+    # ---------- 7. STREME  ----------
 
     def run_streme_for_bins(
         self,
@@ -186,14 +192,14 @@ class AMPAnalysisPipeline:
         seed=42,
     ):
         """
-        STREME'in sistem PATH'inde kurulu olduğunu varsayar.
-        Bu metot sadece streme komutu varsa çalışır.
+       This assumes that STREME is installed in the system PATH. This method will only work if the `streme` command exists.
+
         """
         import shutil
 
         if shutil.which("streme") is None:
             raise RuntimeError(
-                "'streme' komutu bulunamadı. MEME Suite'in kurulu ve PATH'te olduğundan emin ol."
+                "'The 'streme' command was not found. Make sure MEME Suite is installed and in the PATH."
             )
 
         for low, high in self.length_bins:
@@ -227,8 +233,8 @@ class AMPAnalysisPipeline:
                         cleaned += 1
                     fout.write(new_seq + "\n")
             print(
-                f"[INFO] {low}-{high}aa temiz FASTA: {fasta_clean} "
-                f"(toplam {total}, temizlenen {cleaned})"
+                f"[INFO] {low}-{high}aa cleaned FASTA: {fasta_clean} "
+                f"(total {total}, cleaned  {cleaned})"
             )
 
             cmd = [
@@ -252,4 +258,4 @@ class AMPAnalysisPipeline:
             ]
             print(f"[CMD] {' '.join(cmd)}")
             subprocess.run(cmd, check=True)
-            print(f"[OK] STREME sonuçları: {out_dir}")
+            print(f"[OK] STREME results: {out_dir}")

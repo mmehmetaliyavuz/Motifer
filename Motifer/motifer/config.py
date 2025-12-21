@@ -1,6 +1,6 @@
 import os
 
-# Varsayılan temel dizin (isteğe göre değiştir)
+
 BASE_DIR = os.path.abspath(os.path.join(os.path.dirname(__file__), ".."))
 
 DRAMP_EXCEL_URL = (

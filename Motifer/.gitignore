@@ -1,14 +1,49 @@
-# Ignore Python virtual environments
-.venv/
-venv/
-
-# Ignore Python cache files
-__pycache__/
-*.pyc
-
-# Ignore macOS system files
+# =========================
+# macOS
+# =========================
 .DS_Store
 
-# Ignore Jupyter notebook checkpoints
+# =========================
+# Python
+# =========================
+__pycache__/
+*.pyc
+*.pyo
+.venv/
+env/
+venv/
+
+# =========================
+# IDE / Editors
+# =========================
+.idea/
+.vscode/
+
+# =========================
+# Jupyter
+# =========================
 .ipynb_checkpoints/
+
+# =========================
+# Project outputs (generated)
+# =========================
+*.png
+*.txt
+*_mafft.fasta
+*_normalized.fasta
+streme_*_out/
+length_hist.png
+consensus_and_core.fasta
+core_motifs_threshold_0.5.txt
+
+# =========================
+# Data files (large / raw)
+# =========================
+*.xlsx
+*.csv
+
+# =========================
+# OS / Misc
+# =========================
+Thumbs.db
 
