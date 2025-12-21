@@ -1,0 +1,49 @@
+# =========================
+# macOS
+# =========================
+.DS_Store
+
+# =========================
+# Python
+# =========================
+__pycache__/
+*.pyc
+*.pyo
+.venv/
+env/
+venv/
+
+# =========================
+# IDE / Editors
+# =========================
+.idea/
+.vscode/
+
+# =========================
+# Jupyter
+# =========================
+.ipynb_checkpoints/
+
+# =========================
+# Project outputs (generated)
+# =========================
+*.png
+*.txt
+*_mafft.fasta
+*_normalized.fasta
+streme_*_out/
+length_hist.png
+consensus_and_core.fasta
+core_motifs_threshold_0.5.txt
+
+# =========================
+# Data files (large / raw)
+# =========================
+*.xlsx
+*.csv
+
+# =========================
+# OS / Misc
+# =========================
+Thumbs.db
+
