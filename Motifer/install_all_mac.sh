@@ -12,21 +12,21 @@ cd "$PROJECT_ROOT"
 
 # ---- CHECK HOMEBREW ----
 if ! command -v brew >/dev/null 2>&1; then
-  echo "[INFO] Homebrew bulunamadı. Kuruluyor..."
+  echo "[INFO] Homebrew not found. Installing..."
   /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
 else
-  echo "[OK] Homebrew bulundu."
+  echo "[OK] Homebrew is found."
 fi
 
-echo "[INFO] Homebrew güncelleniyor..."
+echo "[INFO] Homebrew is being updated..."
 brew update
 
 # ---- INSTALL MAFFT ----
 if ! command -v mafft >/dev/null 2>&1; then
-  echo "[INFO] MAFFT kuruluyor..."
+  echo "[INFO] MAFFT Installing..."
   brew install mafft
 else
-  echo "[OK] MAFFT zaten kurulu."
+  echo "[OK] MAFFT is found."
 fi
 
 # ---- INSTALL MEME SUITE (includes STREME) ----
@@ -42,27 +42,28 @@ fi
 
 
 # ---- PYTHON ENV ----
-echo "[INFO] Python virtual environment oluşturuluyor (.venv)..."
+echo "[INFO] 
+Creating a Python virtual environment(.venv)..."
 python3 -m venv .venv
 
-echo "[INFO] venv aktif ediliyor..."
+echo "[INFO] venv is being activated..."
 source .venv/bin/activate
 
-echo "[INFO] pip yükseltiliyor..."
+echo "[INFO] pip upgrading..."
 pip install --upgrade pip
 
-echo "[INFO] Python bağımlılıkları yükleniyor..."
+echo "[INFO] Installing Python dependencies..."
 if [ -f "requirements.txt" ]; then
   pip install -r requirements.txt
 else
-  echo "[WARN] requirements.txt bulunamadı, atlanıyor."
+  echo "[WARN] requirements.txt not found, skipped."
 fi
 
 echo "========================================"
-echo "    🎉 KURULUM TAMAMLANDI 🎉"
+echo "    🎉 INSTALLATION IS COMPLETED 🎉"
 echo "========================================"
 echo ""
-echo "Kullanım:"
+echo "Usage:"
 echo "  source .venv/bin/activate"
 echo "  python scripts/run_full_pipeline.py"
 echo ""
